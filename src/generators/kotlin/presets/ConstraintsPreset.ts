@@ -3,6 +3,7 @@ import {
   ConstrainedFloatModel,
   ConstrainedIntegerModel,
   ConstrainedMetaModel,
+  ConstrainedObjectModel,
   ConstrainedStringModel
 } from '../../../models';
 import { KotlinPreset } from '../KotlinPreset';
@@ -24,6 +25,14 @@ export const KOTLIN_CONSTRAINTS_PRESET: KotlinPreset = {
     },
     property({ renderer, property, content }) {
       const annotations: string[] = [];
+
+      // Add @Valid for object/array properties to enable cascading validation
+      if (
+        property.property instanceof ConstrainedObjectModel ||
+        property.property instanceof ConstrainedArrayModel
+      ) {
+        annotations.push(renderer.renderAnnotation('Valid', null, 'get:'));
+      }
 
       if (property.required) {
         annotations.push(renderer.renderAnnotation('NotNull', null, 'get:'));
